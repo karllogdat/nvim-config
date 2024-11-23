@@ -9,6 +9,7 @@ return {
 				cmd = { "jdtls" },
 				root_dir = require("lspconfig").util.root_pattern(".git", "mvnw", "gradlew", "pom.xml", "build.gradle"),
 			}
+			require("lspconfig").clangd.setup {}
 		end,
 	},
 	{
@@ -47,7 +48,7 @@ return {
 		build = ":TSUpdate",
 		config = function()
 			require'nvim-treesitter.configs'.setup {
-				ensure_installed = { "java" },
+				ensure_installed = { "java", "c" },
 				auto_install = true,
 				highlight = {
 					enable = true,
