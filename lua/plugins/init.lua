@@ -1,5 +1,46 @@
 return {
 	{
+		"nvim-telescope/telescope.nvim",
+		tag = "0.1.8",
+		dependencies = {
+			{ "nvim-lua/plenary.nvim" },
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = make },
+		},
+		config = function()
+			local telescope = require("telescope")
+			telescope.setup({
+				defaults = {
+					vimgrep_arguments = {
+						"rg",
+						"--color=never",
+						"--no-heading",
+						"--with-filename",
+						"--line-number",
+						"--column",
+						"--smat_case",
+					},
+					path_display = { "truncate" },
+					mappings = {
+						i = {
+							["<C-n>"] = require("telescope.actions").cycle_history_next,
+							["<C-p>"] = require("telescope.actions").cycle_history_prev,
+							["<C-c>"] = require("telescope.actions").close,
+						},
+					},
+				},
+				extensions = {
+					fzf = {
+						fuzzy = true,
+						override_generic_sorter = true,
+						override_file_sorter = true,
+						case_mode = "smart_case",
+					},
+				},
+			})
+			telescope.load_extension("fzf")
+		end,
+	},
+	{
 		"neovim/nvim-lspconfig",
 		dependencies = { "williamboman/mason.nvim", "williamboman/mason-lspconfig.nvim" },
 		config = function()
@@ -33,6 +74,29 @@ return {
 					["<C-p>"] = cmp.mapping.select_prev_item(),
 					["<C-y>"] = cmp.mapping.confirm({ select = true }),
 					["<C-Space>"] = cmp.mapping.complete(),
+
+					["<Tab>"] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							cmp.select_next_item()
+						elseif vim.fn then vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>(vsnip-expand-or-jump)", true, true, true), "")
+						elseif has_words_before() then
+							cmp.complete()
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
+
+					["<S-Tab>"] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							cmp.select_prev_item()
+						elseif vim.fn["vsnip#jumpable"](-1) == 1 then
+							vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>(vsnip-jump-prev)", true, true, true), "")
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
+
+					["<CR>"] = cmp.mapping.confirm({ select = true }),
 				}),
 				sources = cmp.config.sources({
 					{ name = "nvim_lsp" },
@@ -95,4 +159,6 @@ return {
 	"folke/neodev.nvim",
 	"folke/which-key.nvim",
 	{ "folke/neoconf.nvim", cmd = "Neoconf" },
+	"hrsh7th/vim-vsnip",
+	"hrsh7th/vim-vsnip-integ",
 }
