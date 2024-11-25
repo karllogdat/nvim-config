@@ -1,4 +1,4 @@
-return {
+return { 
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.8",
@@ -103,6 +103,14 @@ return {
 					{ name = "buffer" },
 					{ name = "path"},
 				}),
+				window = {
+					completion = cmp.config.window.bordered({
+						border = "rounded",
+					}),
+					documentation = cmp.config.window.bordered({
+						border = "single",
+					}),
+				},
 			}
 		end,
 	},
